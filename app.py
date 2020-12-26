@@ -37,7 +37,7 @@ def classify_text():
     if(my_prediction[0]==1):
         text_type="SPAM"
     else:
-        text_type="NOT SPAM"
+        text_type="NOT A SPAM"
     return render_template("textanalysisresult.html",text_type=text_type)
 
 

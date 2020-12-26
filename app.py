@@ -1,9 +1,7 @@
-import numpy as np
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request,render_template
 import pickle
 
 app = Flask(__name__)
-#model = pickle.load(open('model.pkl', 'rb'))
 
 @app.route('/')
 def home():
@@ -28,24 +26,5 @@ def iris_predict():
                            petal_length="Petal Length:{} ".format(iris_features[2]),\
                            petal_width="Petal Width:{} ".format(iris_features[3]))
 
-# @app.route('/predict',methods=['POST'])
-# def predict():
-#     '''
-#     For rendering results on HTML GUI
-#     '''
-#     for i in request.form.values():
-#         print(i)
-#
-#     int_features = [int(x) for x in request.form.values()]
-#     final_features = [np.array(int_features)]
-#     print(final_features)
-#     print(type(final_features))
-#     prediction = model.predict(final_features)
-#
-#     output = round(prediction[0], 2)
-#
-#     return render_template('index.html', prediction_text='Employee Salary should be $ {}'.format(output))
-
-
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)

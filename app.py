@@ -1,68 +1,51 @@
-from flask import Flask, render_template, url_for, flash, redirect
-from forms import RegistrationForm, LoginForm,TextData
-from textutils.utils import TextUtils
+import numpy as np
+from flask import Flask, request, jsonify, render_template
+import pickle
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
+model = pickle.load(open('model.pkl', 'rb'))
 
-posts = [
-    {
-        'author': 'Corey Schafer',
-        'title': 'Blog Post 1',
-        'content': 'First post content',
-        'date_posted': 'April 20, 2018'
-    },
-    {
-        'author': 'Jane Doe',
-        'title': 'Blog Post 2',
-        'content': 'Second post content',
-        'date_posted': 'April 21, 2018'
-    }
-]
-
-
-@app.route("/")
-@app.route("/home")
+@app.route('/')
 def home():
-    return render_template('home.html', posts=posts)
+    return render_template('irisdata.html')
 
 
-@app.route("/about")
-def about():
-    return render_template('result.html', title='About')
+@app.route('/irispredict',methods=['POST'])
+def iris_predict():
+    iris_features=[float(x) for x in request.form.values()]
+    irismodel=pickle.load(open("D:\\testapp\\Heroku-Demo\\irismodel.pkl",'rb'))
+    prediction=irismodel.predict([iris_features])
+    if(prediction[0]==2):
+        class_type="Iris-virginica"
+    if (prediction[0] == 0):
+        class_type = "Iris-versicolor"
+    if (prediction[0] == 1):
+        class_type = "Iris-setosa"
+    return render_template('irisdata.html',\
+                           prediction_result="Class type of the flower:{} ".format(class_type),\
+                           sepal_length="Sepal Length:{} ".format(iris_features[0]),\
+                           sepal_width="Sepal Width:{} ".format(iris_features[1]),\
+                           petal_length="Petal Length:{} ".format(iris_features[2]),\
+                           petal_width="Petal Width:{} ".format(iris_features[3]))
+
+@app.route('/predict',methods=['POST'])
+def predict():
+    '''
+    For rendering results on HTML GUI
+    '''
+    for i in request.form.values():
+        print(i)
+
+    int_features = [int(x) for x in request.form.values()]
+    final_features = [np.array(int_features)]
+    print(final_features)
+    print(type(final_features))
+    prediction = model.predict(final_features)
+
+    output = round(prediction[0], 2)
+
+    return render_template('index.html', prediction_text='Employee Salary should be $ {}'.format(output))
 
 
-@app.route("/register", methods=['GET', 'POST'])
-def register():
-    form = RegistrationForm()
-    data_list=[{'key':form.username.data,'count':form.email.data}]
-    if form.validate_on_submit():
-        flash(f'Account created for {form.username.data}!', 'success')
-        return render_template('result.html', title='About',data_list=data_list)
-    return render_template('register.html', title='Register', form=form)
-
-
-@app.route("/login", methods=['GET', 'POST'])
-def login():
-    form = LoginForm()
-    if form.validate_on_submit():
-        if form.email.data == 'admin@blog.com' and form.password.data == 'password':
-            flash('You have been logged in!', 'success')
-            return redirect(url_for('home'))
-        else:
-            flash('Login Unsuccessful. Please check username and password', 'danger')
-    return render_template('login.html', title='Login', form=form)
-
-@app.route("/textanalysis", methods=['GET', 'POST'])
-def textanalysis():
-    form = TextData()
-    if form.validate_on_submit():
-        obj=TextUtils()
-        data_list=obj.words_frequency(form.textData.data)
-        flash("No of words:{}".format(obj.count_words(form.textData.data)))
-        flash("Words Frequency details")
-        return render_template('result.html', title='About', data_list=data_list)
-    return render_template('textdata.html', title='Textdata', form=form)
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)

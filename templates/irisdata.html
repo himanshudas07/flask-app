@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html >
+<!--From https://codepen.io/frytyler/pen/EGdtg-->
+<head>
+  <meta charset="UTF-8">
+  <title>ML API</title>
+  <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Arimo' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Hind:300' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
+
+</head>
+
+<body>
+ <div class="login">
+	<h1>Iris Classification</h1>
+
+     <!-- Main Input For Receiving Query to our ML -->
+    <form action="{{ url_for('iris_predict')}}"method="post">
+        <input type="text" name="sepal_length" placeholder="Sepal Length" required="required" />
+        <input type="text" name="sepal_width" placeholder="Sepal Width" required="required" />
+		<input type="text" name="petal_length" placeholder="Petal Length" required="required" />
+        <input type="text" name="petal_width" placeholder="Petal Width" required="required" />
+
+        <button type="submit" class="btn btn-primary btn-block btn-large">Predict</button>
+    </form>
+
+   <br>
+   <br>
+   {{ sepal_length }}
+     <br>
+   <br>
+   {{ sepal_width }}
+     <br>
+   <br>
+   {{ petal_length }}
+     <br>
+   <br>
+   {{ petal_width }}
+     <br>
+   <br>
+     {{ prediction_result }}
+
+ </div>
+
+
+</body>
+</html>

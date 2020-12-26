@@ -1,11 +1,11 @@
-from flask import Flask, request,render_template
+from flask import Flask, request, render_template
 import pickle
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/',methods=['GET','POST'])
 def home():
-    return render_template('irisdata.html')
+    return render_template('textclassify.html')
 
 
 @app.route('/irispredict',methods=['POST'])
@@ -25,6 +25,21 @@ def iris_predict():
                            sepal_width="Sepal Width:{} ".format(iris_features[1]),\
                            petal_length="Petal Length:{} ".format(iris_features[2]),\
                            petal_width="Petal Width:{} ".format(iris_features[3]))
+
+@app.route('/classifytext',methods=['POST'])
+def classify_text():
+    text_data=[x for x in request.form.values()]
+    print(text_data)
+    transformer = pickle.load(open("transformer.pkl", 'rb'))
+    nb = pickle.load(open("tc.pkl", 'rb'))
+    x = transformer.transform(text_data).toarray()
+    my_prediction = nb.predict(x)
+    if(my_prediction[0]==1):
+        text_type="SPAM"
+    else:
+        text_type="NOT SPAM"
+    return render_template("textanalysisresult.html",text_type=text_type)
+
 
 if __name__ == "__main__":
     app.run(debug=False)
